@@ -41,3 +41,5 @@ foreach (var di in dirsInfo)
 {
     Console.WriteLine(di.Name);
 }
+
+// cercare tutte le sottodirectory della cartella Desktop
