@@ -20,7 +20,7 @@ Console.WriteLine(string.Join(",", quadrati));
 // primi 5 numeri => 5+4+3+2+1 = 15
 int SommaPrimiNNumeri(int n)
 {
-    if (n == 0)
+    if (n <= 0)
         return 0;
     else
         return n + SommaPrimiNNumeri(n - 1);
