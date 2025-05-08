@@ -1,4 +1,6 @@
-﻿// filesystem => files e cartelle del computer
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
+
 void LogTitolo(string titolo)
 {
     Console.WriteLine("");
@@ -7,117 +9,84 @@ void LogTitolo(string titolo)
     Console.ResetColor();
 }
 
-// leggere contenuto di una cartella
+// datetime e timespan
+DateTime oggi = DateTime.Now;
+LogTitolo("Data di oggi");
+Console.WriteLine(oggi);
 
-// cartella corrente
-LogTitolo("root");
-var root = Directory.GetCurrentDirectory();
-Console.WriteLine(root);
+TimeSpan ora = oggi.TimeOfDay; // TimeSpan => intervallo di tempo
+LogTitolo("Orario");
+Console.WriteLine(ora);
 
-// informazioni sulla directory
-var rootInfo = new DirectoryInfo(root);
-LogTitolo("rootInfo.Name");
-Console.WriteLine(rootInfo.Name);
-LogTitolo("rootInfo.Parent");
-Console.WriteLine(rootInfo.Parent);
+// creare una nuova data
+var scopertAmerica = new DateTime(1492, 10, 12);
+var durata = new TimeSpan(23, 16, 0);
+var durata2 = TimeSpan.FromMinutes(123);
 
-// trovare le sottodirectory
-// var dirs = Directory.GetDirectories(root); // percorso di directory assoluto
-// var dirs = Directory.GetDirectories("documenti"); // percorso di directory relativo
-var dirs = Directory.GetDirectories("documenti", "prev*", SearchOption.AllDirectories); // percorso di directory relativo
+scopertAmerica = scopertAmerica.Add(durata);
+LogTitolo("Date e ora scoperta America");
+Console.WriteLine(scopertAmerica);
 
-// overloads
-// modi diversi (elenco di parametri) di chiamare la setssa funzione
+var oggiUTC = DateTimeOffset.UtcNow; // data di adesso con fuso orario 0 GMT 0
+LogTitolo("Data Offset UTC");
+Console.WriteLine(oggiUTC);
+Console.WriteLine(oggiUTC.LocalDateTime);
 
-LogTitolo("Lista directories");
-foreach (var dir in dirs)
-{
-    Console.WriteLine(dir);
-}
+var oggiItalia = DateTimeOffset.Now;
+Console.WriteLine(oggiItalia.DateTime);
+Console.WriteLine(oggiItalia.UtcDateTime);
 
-LogTitolo("Lista directories info");
-var dirsInfo = rootInfo.GetDirectories();
-foreach (var di in dirsInfo)
-{
-    Console.WriteLine(di.Name);
-}
+// epoch
+LogTitolo("Epoch (Unix Time Stamp) => Numero di secondi/millisecondi passati dal 1/1/1970 00:00:00 UTC");
+var epoch = DateTimeOffset.FromUnixTimeSeconds(190940400);
+Console.WriteLine(epoch.LocalDateTime);
+Console.WriteLine(oggiUTC.ToUnixTimeSeconds());
 
-// files
-var annoFatture = 2021;
-var fatturePath = Path.Combine("documenti", "fatture", annoFatture.ToString());
-var files = Directory.GetFiles(fatturePath);
-LogTitolo("Lista files");
-Console.WriteLine(string.Join("\n", files));
+// formattazione
+LogTitolo("Formattazione date");
+Console.WriteLine(oggi.ToString());
+Console.WriteLine(oggi.ToShortDateString());
+Console.WriteLine(oggi.ToLongDateString());
+Console.WriteLine(oggi.ToShortTimeString());
+Console.WriteLine(oggi.ToString("dddd, dd MMM yyyy HH:mm"));
+// https://freeasphosting.net/date-time-format-in-c-sharp-datetime-formatting-c-sharp.html
+Console.WriteLine(oggi.ToString("dddd, dd MMMM yyyy HH:mm", new CultureInfo("en-EN")));
+Console.WriteLine(oggi.ToString("dddd, dd MMMM yyyy HH:mm", new CultureInfo("it-IT")));
 
-var filesInfo = rootInfo.GetFiles("*.pdf", SearchOption.AllDirectories);
-LogTitolo("Lista files FileInfo");
-foreach (var fi in filesInfo)
-{
-    // alternativa 1
-    Console.WriteLine($"{fi.CreationTime} {fi.Directory?.Name} {fi.Name}");
+DateTime d;
+bool isSuccess = DateTime.TryParse("10-22-2015", out d);
+LogTitolo("TryParse Inglese (server in Italiano)");
+Console.WriteLine(isSuccess);
+Console.WriteLine(d);
+Console.WriteLine();
 
-    // alternativa 2
-    // var dir = fi.Directory == null ? "DIR NON TROVATA" : fi.Directory.Name;
-    var dirName = fi.Directory?.Name;
-    var dir = dirName ?? "DIR NON TROVATA";
-    Console.WriteLine($"{fi.CreationTime} {dir} {fi.Name}");
-}
+isSuccess = DateTime.TryParse("22/10/2015", out d);
+LogTitolo("TryParse Italiano (server in Italiano)");
+Console.WriteLine(isSuccess);
+Console.WriteLine(d);
+Console.WriteLine();
 
-LogTitolo("Lista files FileInfo Elegante");
-Console.WriteLine(string.Join("\n", filesInfo.Select(fi => $"{fi.CreationTime} {fi.Directory?.Name} {fi.Name}")));
+CultureInfo provider = CultureInfo.InvariantCulture;
+isSuccess = DateTime.TryParseExact("10-25-2019", "MM-dd-yyyy", provider, DateTimeStyles.None, out d);
+Console.WriteLine(isSuccess);
+Console.WriteLine(d);
 
-// leggere il contenuto 
-var filePath = Path.Combine("documenti", "preventivi", "todo.txt");
-LogTitolo("Lettura file di testo");
-var testo = File.ReadAllText(filePath);
-Console.WriteLine(testo);
+// componenti delle date
+LogTitolo("Componenti dell'oggetto DateTime");
+Console.WriteLine(oggi.Date);
+Console.WriteLine(oggi.Month);
+Console.WriteLine(oggi.Hour);
 
-var righe = File.ReadAllLines(filePath);
-LogTitolo("Lettura testo riga per riga");
+// operazioni tra le date
+var dataPleasePleaseMe = new DateTime(1963, 3, 22);
+var dataLetItBe = new DateTime(1970, 5, 8);
 
-var numeroRiga = 1;
-foreach (var riga in righe)
-{
-    Console.WriteLine($"{numeroRiga} - {riga}");
-    numeroRiga++;
-}
+LogTitolo("Operazioni sulle date");
+Console.WriteLine(dataPleasePleaseMe);
+Console.WriteLine(dataPleasePleaseMe.Add(new TimeSpan(48, 0, 0)));
+Console.WriteLine(dataPleasePleaseMe.AddDays(-5));
 
-// scrittura file
-// se il percorso non esiste, nel momento in cui scriviamo viene creato
-filePath = @"C:\Progetti\Tutorials\LAB4T\dotNET\dotnet_aprile_2025\cs-funzioni\documenti\note.txt";
-string[] righeDaScrivere = ["Nota 1", "Nota 2", "Nota 3"];
-File.WriteAllLines(filePath, righeDaScrivere);
-
-string[] righeDaRiScrivere = ["Nota 01", "Nota 02", "Nota 03"];
-File.AppendAllLines(filePath, righeDaRiScrivere);
-
-// StremWriter, StreamReader
-
-// spostare, copiare, eliminare files
-string fileName = "f1.pdf";
-string cartellaSorgente = Path.Combine("documenti", "fatture", "2021");
-string cartellaDestinazione = Path.Combine("documenti", "fatture", "2022");
-
-if (!Directory.Exists(cartellaDestinazione))
-    Directory.CreateDirectory(cartellaDestinazione);
-
-string fileSorgente = Path.Combine(cartellaSorgente, fileName);
-string fileDestinazione = Path.Combine(cartellaDestinazione, fileName);
-
-// copia file (copia e incolla)
-if (File.Exists(fileSorgente) && !File.Exists(fileDestinazione))
-    File.Copy(fileSorgente, fileDestinazione);
-
-
-// sposta file (taglia e incolla)
-fileSorgente = Path.Combine(cartellaSorgente, "f2.pdf");
-fileDestinazione = Path.Combine(cartellaDestinazione, "f2.pdf");
-
-if (File.Exists(fileSorgente))
-    File.Move(fileSorgente, fileDestinazione, true);
-
-
-File.Copy(Path.Combine("documenti", "note.txt"), Path.Combine("documenti", "note.json"), true);
-
-// elimina
-File.Delete(Path.Combine("documenti", "note.json"));
+var tempoPassato = dataLetItBe - dataPleasePleaseMe;
+tempoPassato = dataLetItBe.Subtract(dataPleasePleaseMe); // alternativa
+Console.WriteLine(Convert.ToInt32(tempoPassato.TotalDays / 365));
+Console.WriteLine(dataPleasePleaseMe > dataLetItBe);
