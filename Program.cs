@@ -93,5 +93,31 @@ File.AppendAllLines(filePath, righeDaRiScrivere);
 
 // StremWriter, StreamReader
 
+// spostare, copiare, eliminare files
+string fileName = "f1.pdf";
+string cartellaSorgente = Path.Combine("documenti", "fatture", "2021");
+string cartellaDestinazione = Path.Combine("documenti", "fatture", "2022");
 
-// matteo 10:08
+if (!Directory.Exists(cartellaDestinazione))
+    Directory.CreateDirectory(cartellaDestinazione);
+
+string fileSorgente = Path.Combine(cartellaSorgente, fileName);
+string fileDestinazione = Path.Combine(cartellaDestinazione, fileName);
+
+// copia file (copia e incolla)
+if (File.Exists(fileSorgente) && !File.Exists(fileDestinazione))
+    File.Copy(fileSorgente, fileDestinazione);
+
+
+// sposta file (taglia e incolla)
+fileSorgente = Path.Combine(cartellaSorgente, "f2.pdf");
+fileDestinazione = Path.Combine(cartellaDestinazione, "f2.pdf");
+
+if (File.Exists(fileSorgente))
+    File.Move(fileSorgente, fileDestinazione, true);
+
+
+File.Copy(Path.Combine("documenti", "note.txt"), Path.Combine("documenti", "note.json"), true);
+
+// elimina
+File.Delete(Path.Combine("documenti", "note.json"));
