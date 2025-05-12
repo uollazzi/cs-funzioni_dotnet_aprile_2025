@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using System.Runtime.InteropServices;
-
-void LogTitolo(string titolo)
+﻿void LogTitolo(string titolo)
 {
     Console.WriteLine("");
     Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -9,84 +6,101 @@ void LogTitolo(string titolo)
     Console.ResetColor();
 }
 
-// datetime e timespan
-DateTime oggi = DateTime.Now;
-LogTitolo("Data di oggi");
-Console.WriteLine(oggi);
+// eccezioni
+LogTitolo("Eccezioni comuni di sistema");
 
-TimeSpan ora = oggi.TimeOfDay; // TimeSpan => intervallo di tempo
-LogTitolo("Orario");
-Console.WriteLine(ora);
+var n = 2;
+var m = 0;
 
-// creare una nuova data
-var scopertAmerica = new DateTime(1492, 10, 12);
-var durata = new TimeSpan(23, 16, 0);
-var durata2 = TimeSpan.FromMinutes(123);
+// Console.WriteLine("Divisione per zero");
+// var r = n / m;
 
-scopertAmerica = scopertAmerica.Add(durata);
-LogTitolo("Date e ora scoperta America");
-Console.WriteLine(scopertAmerica);
+// string[] animali = ["cane", "gatto"];
+// Console.WriteLine("Indice oltre il range");
+// Console.WriteLine(animali[5]);
 
-var oggiUTC = DateTimeOffset.UtcNow; // data di adesso con fuso orario 0 GMT 0
-LogTitolo("Data Offset UTC");
-Console.WriteLine(oggiUTC);
-Console.WriteLine(oggiUTC.LocalDateTime);
+// try / catch
+// serve per gestire le eccezioni in modo che il ns programma non crashi
+LogTitolo("Costrutto try/catch");
 
-var oggiItalia = DateTimeOffset.Now;
-Console.WriteLine(oggiItalia.DateTime);
-Console.WriteLine(oggiItalia.UtcDateTime);
+try
+{
+    var r = n / m;
+}
+catch (Exception ex)
+{
+    // blocco eseguito solo se c'è un errore
+    Console.WriteLine(ex.Message);
+}
+finally
+{
+    // blocco eseguito comunque anche se c'è stato un errore
+    Console.WriteLine("Eseguito in tutti i casi");
+}
 
-// epoch
-LogTitolo("Epoch (Unix Time Stamp) => Numero di secondi/millisecondi passati dal 1/1/1970 00:00:00 UTC");
-var epoch = DateTimeOffset.FromUnixTimeSeconds(190940400);
-Console.WriteLine(epoch.LocalDateTime);
-Console.WriteLine(oggiUTC.ToUnixTimeSeconds());
+LogTitolo("try / catch multipli");
 
-// formattazione
-LogTitolo("Formattazione date");
-Console.WriteLine(oggi.ToString());
-Console.WriteLine(oggi.ToShortDateString());
-Console.WriteLine(oggi.ToLongDateString());
-Console.WriteLine(oggi.ToShortTimeString());
-Console.WriteLine(oggi.ToString("dddd, dd MMM yyyy HH:mm"));
-// https://freeasphosting.net/date-time-format-in-c-sharp-datetime-formatting-c-sharp.html
-Console.WriteLine(oggi.ToString("dddd, dd MMMM yyyy HH:mm", new CultureInfo("en-EN")));
-Console.WriteLine(oggi.ToString("dddd, dd MMMM yyyy HH:mm", new CultureInfo("it-IT")));
+try
+{
+    var t = File.ReadAllText("pippo.txt");
 
-DateTime d;
-bool isSuccess = DateTime.TryParse("10-22-2015", out d);
-LogTitolo("TryParse Inglese (server in Italiano)");
-Console.WriteLine(isSuccess);
-Console.WriteLine(d);
-Console.WriteLine();
+    var numero = int.Parse(t);
 
-isSuccess = DateTime.TryParse("22/10/2015", out d);
-LogTitolo("TryParse Italiano (server in Italiano)");
-Console.WriteLine(isSuccess);
-Console.WriteLine(d);
-Console.WriteLine();
+    var r2 = n / numero;
+}
+catch (FileNotFoundException ex)
+{
+    Console.WriteLine(ex);
+}
+catch (FormatException ex)
+{
+    Console.WriteLine("il testo non è un numero");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Eccezione generica.");
+}
 
-CultureInfo provider = CultureInfo.InvariantCulture;
-isSuccess = DateTime.TryParseExact("10-25-2019", "MM-dd-yyyy", provider, DateTimeStyles.None, out d);
-Console.WriteLine(isSuccess);
-Console.WriteLine(d);
+// throw e eccezioni custom
+var anni = 20;
 
-// componenti delle date
-LogTitolo("Componenti dell'oggetto DateTime");
-Console.WriteLine(oggi.Date);
-Console.WriteLine(oggi.Month);
-Console.WriteLine(oggi.Hour);
+if (anni > 18)
+{
+    Console.WriteLine($"Ha la patente da {anni - 18} anni");
+}
+else
+{
+    throw new Exception("Non ha la patente");
+}
 
-// operazioni tra le date
-var dataPleasePleaseMe = new DateTime(1963, 3, 22);
-var dataLetItBe = new DateTime(1970, 5, 8);
+void CalcolaAnniPatente(int? anni)
+{
+    if (!anni.HasValue)
+    {
+        throw new NullReferenceException("Specificare gli anni");
+    }
 
-LogTitolo("Operazioni sulle date");
-Console.WriteLine(dataPleasePleaseMe);
-Console.WriteLine(dataPleasePleaseMe.Add(new TimeSpan(48, 0, 0)));
-Console.WriteLine(dataPleasePleaseMe.AddDays(-5));
+    if (anni < 18)
+        throw new Exception("Non ha la patente!");
 
-var tempoPassato = dataLetItBe - dataPleasePleaseMe;
-tempoPassato = dataLetItBe.Subtract(dataPleasePleaseMe); // alternativa
-Console.WriteLine(Convert.ToInt32(tempoPassato.TotalDays / 365));
-Console.WriteLine(dataPleasePleaseMe > dataLetItBe);
+    Console.WriteLine($"Ha la patente da {anni - 18} anni");
+}
+
+int? eta = 9;
+
+try
+{
+    CalcolaAnniPatente(eta);
+}
+catch (NullReferenceException ex)
+{
+    Console.WriteLine("Eccezione null gestita.");
+    Console.WriteLine(ex.Message);
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Eccezione generica gestita.");
+    Console.WriteLine(ex.Message);
+}
+
+Console.WriteLine("Finito");
